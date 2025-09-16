@@ -1,0 +1,15 @@
+{
+    "name": "Ruckit Assets",
+    "supportEmail": "parker@traxxisgps.com",
+    "version": "1.0",
+    "items": [
+        {
+            "url": "ruckitAssets.html",
+            "category": "AddIns",
+            "menuName": {
+                "en": "Ruckit Assets"
+            }
+        }
+    ],
+    "isSigned": false
+}

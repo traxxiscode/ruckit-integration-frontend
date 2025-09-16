@@ -1,0 +1,665 @@
+/* Ruckit Assets Styles - Updated to match modern design */
+:root {
+    /* Primary colors matching index.css */
+    --primary-orange: #e55a2b;
+    --secondary-orange: #d4761a;
+    --primary-blue: #1e3c72;
+    --secondary-blue: #2a5298;
+    --light-blue: #dbeafe;
+    --dark-blue: #1e40af;
+    --accent-blue: #03adfc;
+    --accent-blue-dark: #0394fc;
+    
+    /* Neutral colors */
+    --header-grey: #6b7280;
+    --light-grey: #f8f9fa;
+    --border-grey: #e9ecef;
+    --text-muted: #6c757d;
+    --white: #ffffff;
+    
+    /* Success/Error colors */
+    --success-green: #28a745;
+    --success-green-light: #dcfce7;
+    --success-green-dark: #166534;
+    --error-red: #dc3545;
+    --error-red-light: #fef2f2;
+    --error-red-dark: #991b1b;
+}
+
+body {
+    background-color: var(--light-grey);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styles - Updated to match modern gradient design */
+.header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: white;
+    padding: 1.5rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+    pointer-events: none;
+}
+
+.header-content {
+    min-height: 80px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 300;
+}
+
+/* Logo Styles */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.company-logo {
+    max-width: 120px;
+    max-height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(1.1);
+    transition: all 0.3s ease;
+}
+
+.company-logo:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+.logo-placeholder {
+    display: none;
+    text-align: center;
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+}
+
+.logo-icon i {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.logo-placeholder small {
+    opacity: 0.8;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Button Styles - Updated to match modern gradient design */
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-refresh {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(229, 90, 43, 0.3);
+}
+
+.btn-refresh:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 90, 43, 0.4);
+    color: white;
+}
+
+.btn-view-asset {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 2px 8px rgba(3, 173, 252, 0.3);
+}
+
+.btn-view-asset:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(3, 173, 252, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Main Container */
+.main-container {
+    padding: 2rem 0;
+    max-width: 1200px;
+}
+
+/* Card Styles - Updated for modern appearance */
+.card {
+    background: white;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+    pointer-events: none;
+}
+
+.card-header h5 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.card-header .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 15px;
+    font-weight: 500;
+}
+
+.card-body {
+    padding: 0;
+}
+
+/* Table Styles - Improved readability and consistency */
+.table {
+    margin: 0;
+    color: #333;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.table thead th:first-child {
+    border-top-left-radius: 0;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 0;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-grey);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(229, 90, 43, 0.05);
+    transform: translateX(2px);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border: none;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Improved column-specific styling for better readability */
+.table tbody td:first-child {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* Ruckit Device, Driver, and Token columns - normal text styling */
+.table tbody td:nth-child(2),
+.table tbody td:nth-child(3),
+.table tbody td:nth-child(4) {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Remove special styling from badges and code elements in these columns */
+.table tbody td:nth-child(2) .badge,
+.table tbody td:nth-child(3) .badge,
+.table tbody td:nth-child(4) .badge {
+    background: none !important;
+    color: #333 !important;
+    font-weight: 500;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+}
+
+.table tbody td:nth-child(2) code,
+.table tbody td:nth-child(3) code,
+.table tbody td:nth-child(4) code {
+    background-color: transparent;
+    color: #333;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    border: none;
+    font-family: inherit;
+}
+
+.table tbody td:nth-child(5) {
+    text-align: center;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.loading-spinner .spinner-border {
+    width: 2rem;
+    height: 2rem;
+    color: var(--primary-orange);
+}
+
+.loading-spinner p {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+/* Alert Styles - Updated for better visibility */
+.alert {
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: var(--success-green-light);
+    color: var(--success-green-dark);
+    border-left: 4px solid var(--success-green);
+}
+
+.alert-danger {
+    background-color: var(--error-red-light);
+    color: var(--error-red-dark);
+    border-left: 4px solid var(--error-red);
+}
+
+.alert-info {
+    background-color: rgba(3, 173, 252, 0.1);
+    color: var(--primary-blue);
+    border-left: 4px solid var(--accent-blue);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-orange);
+    opacity: 0.7;
+}
+
+.empty-state h5 {
+    color: var(--primary-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Text utilities for better contrast */
+.text-primary {
+    color: var(--primary-blue) !important;
+}
+
+.text-secondary {
+    color: var(--text-muted) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.bg-orange {
+    background-color: var(--primary-orange) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem 0;
+    }
+    
+    .header-title {
+        font-size: 1.5rem;
+    }
+    
+    .header-buttons {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 1rem;
+    }
+    
+    .btn-refresh {
+        width: 100%;
+    }
+    
+    .main-container {
+        padding: 1rem 0;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .company-logo {
+        max-width: 100px;
+        max-height: 45px;
+    }
+    
+    .btn-view-asset {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header-buttons,
+    .btn-refresh,
+    .btn-view-asset {
+        display: none;
+    }
+    
+    .header {
+        background: var(--primary-blue) !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .table thead th {
+        background-color: var(--primary-blue) !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .card-header {
+        background: var(--primary-orange) !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+
+/* Search Bar Styles - Add these to your existing ruckitAssets.css */
+
+.search-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+    box-shadow: 0 6px 25px rgba(229, 90, 43, 0.15);
+}
+
+.search-header {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    position: relative;
+}
+
+.search-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+    pointer-events: none;
+}
+
+.search-header h6 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.search-body {
+    padding: 1.5rem;
+}
+
+.search-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid var(--border-grey);
+    border-radius: 25px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--light-grey);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-orange);
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(229, 90, 43, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.search-input:focus + .search-icon {
+    color: var(--primary-orange);
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.search-clear-btn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-clear-btn:hover {
+    color: var(--error-red);
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.search-stats {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-grey);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-results-count {
+    font-weight: 500;
+}
+
+.search-results-count.filtered {
+    color: var(--primary-orange);
+}
+
+/* No results state */
+.no-search-results {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-muted);
+}
+
+.no-search-results i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-orange);
+    opacity: 0.5;
+}
+
+.no-search-results h5 {
+    color: var(--primary-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.no-search-results p {
+    color: var(--text-muted);
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Responsive adjustments for search */
+@media (max-width: 768px) {
+    .search-container {
+        margin-bottom: 1rem;
+    }
+    
+    .search-header,
+    .search-body {
+        padding: 1rem;
+    }
+    
+    .search-input {
+        padding: 0.6rem 0.8rem 0.6rem 2.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .search-icon {
+        left: 0.8rem;
+        font-size: 1rem;
+    }
+    
+    .search-clear-btn {
+        right: 0.6rem;
+        font-size: 1.1rem;
+    }
+    
+    .search-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}

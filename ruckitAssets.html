@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruckit Assets</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="ruckitAssets.css">
+    <script src="https://cdn.jsdelivr.net/npm/mg-api-js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center text-md-start mb-3 mb-md-0">
+                        <!-- Company Logo -->
+                        <div class="logo-container">
+                            <img src="https://traxxisgps.com/wp-content/uploads/elementor/thumbs/Traxxis-refresh-logo_horizontal-min-1-qjgvd5cr9kxu5eay6trn10pbylz31ardqnqdluuew0.webp" alt="Company Logo" class="company-logo" 
+                                 onerror="this.style.display='none'; document.getElementById('logo-placeholder').style.display='block';">
+                            <div id="logo-placeholder" class="logo-placeholder">
+                                <div class="logo-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <small>Your Logo</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <h1 class="header-title">
+                            <i class="fas fa-truck me-3"></i>Ruckit Assets
+                        </h1>
+                        <p class="header-subtitle mt-2">
+                            View your Ruckit device mappings
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-center text-md-end">
+                        <div class="header-buttons">
+                            <button class="btn btn-refresh" onclick="refreshData()">
+                                <i class="fas fa-sync-alt me-2"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-container" id="ruckitAssets">
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-header">
+                <h6>
+                    <i class="fas fa-search me-2"></i>Search Assets
+                </h6>
+            </div>
+            <div class="search-body">
+                <div class="search-input-group">
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Search by asset name...">
+                    <i class="fas fa-search search-icon"></i>
+                    <button type="button" class="search-clear-btn" id="searchClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-stats">
+                    <span class="search-results-count" id="searchResults">Showing all assets</span>
+                    <span class="text-muted" id="totalAssets">Total: 0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Assets Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Assets Overview
+                    <span class="badge ms-2" id="assetCount">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-tag me-2"></i>Asset Name</th>
+                                <th><i class="fas fa-microchip me-2"></i>Ruckit Device</th>
+                                <th><i class="fas fa-user me-2"></i>Ruckit Driver</th>
+                                <th><i class="fas fa-key me-2"></i>Ruckit Token</th>
+                                <th><i class="fas fa-external-link-alt me-2"></i>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="loading-spinner">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2 mb-0">Loading assets...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="ruckitAssets.js"></script>
+</body>
+</html>
