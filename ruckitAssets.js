@@ -396,6 +396,19 @@ geotab.addin.ruckitAssets = function () {
     }
 
     /**
+     * Get all devices from Geotab
+     */
+    async function getAllDevices() {
+        try {
+            const devices = await makeGeotabCall("Get", "Device", {});
+            return devices || [];
+        } catch (error) {
+            console.error('Error fetching all devices:', error);
+            return [];
+        }
+    }
+
+    /**
      * Filter data for all devices column
      */
     function filterAllDevicesBySearch(data, searchTerm) {
