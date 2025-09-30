@@ -51,61 +51,125 @@
         <!-- Alert Messages -->
         <div id="alertContainer"></div>
         
-        <!-- Search Bar -->
-        <div class="search-container">
-            <div class="search-header">
-                <h6>
-                    <i class="fas fa-search me-2"></i>Search Assets
-                </h6>
-            </div>
-            <div class="search-body">
-                <div class="search-input-group">
-                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Search by asset name...">
-                    <i class="fas fa-search search-icon"></i>
-                    <button type="button" class="search-clear-btn" id="searchClear">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div class="row">
+            <!-- Left Column: All Assets -->
+            <div class="col-md-6">
+                <!-- Search Bar for All Assets -->
+                <div class="search-container">
+                    <div class="search-header">
+                        <h6>
+                            <i class="fas fa-search me-2"></i>Search All Assets
+                        </h6>
+                    </div>
+                    <div class="search-body">
+                        <div class="search-input-group">
+                            <input type="text" class="form-control search-input" id="searchInputAll" placeholder="Search by asset name...">
+                            <i class="fas fa-search search-icon"></i>
+                            <button type="button" class="search-clear-btn" id="searchClearAll">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="search-stats">
+                            <span class="search-results-count" id="searchResultsAll">Showing all assets</span>
+                            <span class="text-muted" id="totalAssetsAll">Total: 0</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="search-stats">
-                    <span class="search-results-count" id="searchResults">Showing all assets</span>
-                    <span class="text-muted" id="totalAssets">Total: 0</span>
+                
+                <!-- All Assets Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>All Assets
+                            <span class="badge ms-2" id="assetCountAll">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-tag me-2"></i>Asset Name</th>
+                                        <th><i class="fas fa-cog me-2"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allAssetsTableBody">
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            <div class="loading-spinner">
+                                                <div class="spinner-border" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-2 mb-0">Loading assets...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Assets Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-list me-2"></i>Assets Overview
-                    <span class="badge ms-2" id="assetCount">0</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-tag me-2"></i>Asset Name</th>
-                                <th><i class="fas fa-microchip me-2"></i>Ruckit Device</th>
-                                <th><i class="fas fa-user me-2"></i>Ruckit Driver</th>
-                                <th><i class="fas fa-key me-2"></i>Ruckit Token</th>
-                                <th><i class="fas fa-external-link-alt me-2"></i>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="assetsTableBody">
-                            <tr>
-                                <td colspan="5" class="text-center">
-                                    <div class="loading-spinner">
-                                        <div class="spinner-border" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p class="mt-2 mb-0">Loading assets...</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            
+            <!-- Right Column: Assets with Ruckit Credentials -->
+            <div class="col-md-6">
+                <!-- Search Bar for Ruckit Assets -->
+                <div class="search-container">
+                    <div class="search-header">
+                        <h6>
+                            <i class="fas fa-search me-2"></i>Search Ruckit Assets
+                        </h6>
+                    </div>
+                    <div class="search-body">
+                        <div class="search-input-group">
+                            <input type="text" class="form-control search-input" id="searchInputRuckit" placeholder="Search by asset name...">
+                            <i class="fas fa-search search-icon"></i>
+                            <button type="button" class="search-clear-btn" id="searchClearRuckit">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="search-stats">
+                            <span class="search-results-count" id="searchResultsRuckit">Showing all assets</span>
+                            <span class="text-muted" id="totalAssetsRuckit">Total: 0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ruckit Assets Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Assets with Ruckit Credentials
+                            <span class="badge ms-2" id="assetCountRuckit">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-tag me-2"></i>Asset Name</th>
+                                        <th><i class="fas fa-microchip me-2"></i>Ruckit Device</th>
+                                        <th><i class="fas fa-user me-2"></i>Ruckit Driver</th>
+                                        <th><i class="fas fa-key me-2"></i>Ruckit Token</th>
+                                        <th><i class="fas fa-cog me-2"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ruckitAssetsTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <div class="loading-spinner">
+                                                <div class="spinner-border" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-2 mb-0">Loading assets...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

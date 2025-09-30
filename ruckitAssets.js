@@ -12,6 +12,11 @@ geotab.addin.ruckitAssets = function () {
     let filteredData = [];
     let currentSubdomain = '';
     let searchTerm = '';
+    let allDevicesData = [];
+    let filteredAllDevices = [];
+    let searchTermAll = '';
+    let searchTermRuckit = '';
+    let editingDeviceId = null;
 
     /**
      * Extract subdomain from current URL
@@ -65,51 +70,6 @@ geotab.addin.ruckitAssets = function () {
             const assetName = (details.name || '').toLowerCase();
             return assetName.includes(term);
         });
-    }
-
-    /**
-     * Apply all filters to the data
-     */
-    function applyFilters() {
-        // First filter out placeholder entries
-        let filtered = filterPlaceholderEntries(assetsData);
-        
-        // Then apply search filter
-        filtered = filterDataBySearch(filtered, searchTerm);
-        
-        filteredData = filtered;
-        renderAssetsTable(filteredData);
-        updateSearchStats();
-    }
-
-    /**
-     * Update search statistics
-     */
-    function updateSearchStats() {
-        const searchResultsEl = document.getElementById('searchResults');
-        const totalAssetsEl = document.getElementById('totalAssets');
-        const assetCountEl = document.getElementById('assetCount');
-        
-        const validAssets = filterPlaceholderEntries(assetsData);
-        const filteredCount = filteredData.length;
-        
-        if (searchResultsEl) {
-            if (searchTerm.trim()) {
-                searchResultsEl.textContent = `Showing ${filteredCount} of ${validAssets.length} assets`;
-                searchResultsEl.classList.add('filtered');
-            } else {
-                searchResultsEl.textContent = 'Showing all assets';
-                searchResultsEl.classList.remove('filtered');
-            }
-        }
-        
-        if (totalAssetsEl) {
-            totalAssetsEl.textContent = `Total: ${validAssets.length}`;
-        }
-        
-        if (assetCountEl) {
-            assetCountEl.textContent = filteredCount;
-        }
     }
 
     /**
@@ -193,7 +153,7 @@ geotab.addin.ruckitAssets = function () {
     }
 
     /**
-     * Load and display Ruckit assets data
+     * Load and display all data
      */
     async function loadRuckitAssets() {
         if (!api) {
@@ -202,47 +162,119 @@ geotab.addin.ruckitAssets = function () {
         }
         
         try {
-            showAlert('Loading Ruckit assets...', 'info');
+            showAlert('Loading assets...', 'info');
             
+            // Load all devices
+            allDevicesData = await getAllDevices();
+            
+            // Load Ruckit mappings
             const ruckitData = await getRuckitMappings();
             assetsData = ruckitData;
             
-            // Reset search term and apply filters
-            searchTerm = '';
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.value = '';
-            }
+            // Reset search terms
+            searchTermAll = '';
+            searchTermRuckit = '';
             
+            const searchInputAll = document.getElementById('searchInputAll');
+            const searchInputRuckit = document.getElementById('searchInputRuckit');
+            
+            if (searchInputAll) searchInputAll.value = '';
+            if (searchInputRuckit) searchInputRuckit.value = '';
+            
+            // Apply filters and render
+            applyAllDevicesFilters();
             applyFilters();
             
             const validAssets = filterPlaceholderEntries(assetsData);
-            
-            if (validAssets.length > 0) {
-                showAlert(`Successfully loaded ${validAssets.length} Ruckit assets`, 'success');
-            } else {
-                showAlert('No Ruckit assets found', 'info');
-            }
+            showAlert(`Loaded ${allDevicesData.length} total assets, ${validAssets.length} with Ruckit credentials`, 'success');
             
         } catch (error) {
-            console.error('Error loading Ruckit assets:', error);
-            showAlert('Error loading Ruckit assets: ' + error.message, 'danger');
-            showEmptyState();
+            console.error('Error loading assets:', error);
+            showAlert('Error loading assets: ' + error.message, 'danger');
         }
+    }
+
+    /**
+     * Render all devices table (left column)
+     */
+    function renderAllDevicesTable(data) {
+        const tableBody = document.getElementById('allAssetsTableBody');
+        if (!tableBody) return;
+        
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="2">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h5>No Assets Found</h5>
+                            <p>No assets found in the system.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        const tableRows = data.map(device => {
+            const deviceId = device.id;
+            const deviceName = device.name || 'N/A';
+            const existingMapping = findExistingMappingForDevice(deviceId);
+            const hasCredentials = existingMapping && 
+                                existingMapping.details['ri-token'] !== 'TOKEN' &&
+                                existingMapping.details['ri-device'] !== 'DeviceID';
+            
+            return `
+                <tr data-device-id="${deviceId}">
+                    <td>
+                        <i class="fas fa-truck me-2 text-primary"></i>
+                        ${escapeHtml(deviceName)}
+                        ${hasCredentials ? '<span class="badge bg-success ms-2">Has Credentials</span>' : ''}
+                    </td>
+                    <td>
+                        <button class="btn-add-credentials" onclick="showCredentialForm('${deviceId}', '${escapeHtml(deviceName)}', ${existingMapping ? 'true' : 'false'})">
+                            <i class="fas fa-plus me-1"></i>${hasCredentials ? 'Edit' : 'Add'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        tableBody.innerHTML = tableRows;
     }
 
     /**
      * Render the assets table
      */
     function renderAssetsTable(data) {
-        const tableBody = document.getElementById('assetsTableBody');
+        const tableBody = document.getElementById('ruckitAssetsTableBody');
         if (!tableBody) return;
         
         if (!data || data.length === 0) {
-            if (searchTerm.trim()) {
-                showNoSearchResults();
+            if (searchTermRuckit.trim()) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="no-search-results">
+                                <i class="fas fa-search"></i>
+                                <h5>No Results Found</h5>
+                                <p>No assets match your search criteria.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             } else {
-                showEmptyState();
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h5>No Ruckit Assets Found</h5>
+                                <p>No assets with Ruckit credentials yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
             return;
         }
@@ -256,12 +288,6 @@ geotab.addin.ruckitAssets = function () {
             const gtDevice = details['gt-device'] || '';
             
             const viewAssetUrl = generateViewAssetUrl(gtDevice);
-            const viewAssetButton = gtDevice ? 
-                `<a href="${viewAssetUrl}" class="btn-view-asset" target="_blank">
-                    <i class="fas fa-external-link-alt"></i>
-                    View Asset
-                </a>` : 
-                `<span class="text-muted">No Device ID</span>`;
             
             return `
                 <tr>
@@ -269,63 +295,25 @@ geotab.addin.ruckitAssets = function () {
                         <i class="fas fa-truck me-2 text-primary"></i>
                         ${escapeHtml(assetName)}
                     </td>
+                    <td>${escapeHtml(ruckitDevice)}</td>
+                    <td>${escapeHtml(ruckitDriver)}</td>
+                    <td>${escapeHtml(ruckitToken)}</td>
                     <td>
-                        ${escapeHtml(ruckitDevice)}
-                    </td>
-                    <td>
-                        ${escapeHtml(ruckitDriver)}
-                    </td>
-                    <td>
-                        ${escapeHtml(ruckitToken)}
-                    </td>
-                    <td>
-                        ${viewAssetButton}
+                        <button class="btn-edit-credentials" onclick="showCredentialForm('${gtDevice}', '${escapeHtml(assetName)}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-clear-credentials" onclick="clearCredentials('${gtDevice}', '${escapeHtml(assetName)}')">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                        ${gtDevice ? `<a href="${viewAssetUrl}" class="btn-view-asset" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> View
+                        </a>` : ''}
                     </td>
                 </tr>
             `;
         }).join('');
         
         tableBody.innerHTML = tableRows;
-    }
-
-    /**
-     * Show empty state in table
-     */
-    function showEmptyState() {
-        const tableBody = document.getElementById('assetsTableBody');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <h5>No Ruckit Assets Found</h5>
-                        <p>No assets with Ruckit device mappings were found in the system.</p>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    /**
-     * Show no search results state
-     */
-    function showNoSearchResults() {
-        const tableBody = document.getElementById('assetsTableBody');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    <div class="no-search-results">
-                        <i class="fas fa-search"></i>
-                        <h5>No Results Found</h5>
-                        <p>No assets match your search criteria. Try adjusting your search term.</p>
-                    </div>
-                </td>
-            </tr>
-        `;
     }
 
     /**
@@ -406,6 +394,392 @@ geotab.addin.ruckitAssets = function () {
             }
         });
     }
+
+    /**
+     * Filter data for all devices column
+     */
+    function filterAllDevicesBySearch(data, searchTerm) {
+        if (!searchTerm.trim()) {
+            return data;
+        }
+        
+        const term = searchTerm.toLowerCase().trim();
+        return data.filter(device => {
+            const deviceName = (device.name || '').toLowerCase();
+            return deviceName.includes(term);
+        });
+    }
+
+    /**
+     * Apply filters to all devices
+     */
+    function applyAllDevicesFilters() {
+        filteredAllDevices = filterAllDevicesBySearch(allDevicesData, searchTermAll);
+        renderAllDevicesTable(filteredAllDevices);
+        updateAllDevicesSearchStats();
+    }
+
+    /**
+     * Apply filters to Ruckit assets
+     */
+    function applyFilters() {
+        let filtered = filterPlaceholderEntries(assetsData);
+        filtered = filterDataBySearch(filtered, searchTermRuckit);
+        
+        filteredData = filtered;
+        renderAssetsTable(filteredData);
+        updateSearchStats();
+    }
+
+    /**
+     * Update search statistics for all devices
+     */
+    function updateAllDevicesSearchStats() {
+        const searchResultsEl = document.getElementById('searchResultsAll');
+        const totalAssetsEl = document.getElementById('totalAssetsAll');
+        const assetCountEl = document.getElementById('assetCountAll');
+        
+        const filteredCount = filteredAllDevices.length;
+        const totalCount = allDevicesData.length;
+        
+        if (searchResultsEl) {
+            if (searchTermAll.trim()) {
+                searchResultsEl.textContent = `Showing ${filteredCount} of ${totalCount} assets`;
+                searchResultsEl.classList.add('filtered');
+            } else {
+                searchResultsEl.textContent = 'Showing all assets';
+                searchResultsEl.classList.remove('filtered');
+            }
+        }
+        
+        if (totalAssetsEl) {
+            totalAssetsEl.textContent = `Total: ${totalCount}`;
+        }
+        
+        if (assetCountEl) {
+            assetCountEl.textContent = filteredCount;
+        }
+    }
+
+    /**
+     * Update search statistics for Ruckit assets
+     */
+    function updateSearchStats() {
+        const searchResultsEl = document.getElementById('searchResultsRuckit');
+        const totalAssetsEl = document.getElementById('totalAssetsRuckit');
+        const assetCountEl = document.getElementById('assetCountRuckit');
+        
+        const validAssets = filterPlaceholderEntries(assetsData);
+        const filteredCount = filteredData.length;
+        
+        if (searchResultsEl) {
+            if (searchTermRuckit.trim()) {
+                searchResultsEl.textContent = `Showing ${filteredCount} of ${validAssets.length} assets`;
+                searchResultsEl.classList.add('filtered');
+            } else {
+                searchResultsEl.textContent = 'Showing all assets';
+                searchResultsEl.classList.remove('filtered');
+            }
+        }
+        
+        if (totalAssetsEl) {
+            totalAssetsEl.textContent = `Total: ${validAssets.length}`;
+        }
+        
+        if (assetCountEl) {
+            assetCountEl.textContent = filteredCount;
+        }
+    }
+
+    /**
+     * Setup search functionality for both columns
+     */
+    function setupSearch() {
+        // All devices search
+        const searchInputAll = document.getElementById('searchInputAll');
+        const searchClearAll = document.getElementById('searchClearAll');
+        
+        if (searchInputAll && searchClearAll) {
+            searchInputAll.addEventListener('input', function(e) {
+                searchTermAll = e.target.value;
+                applyAllDevicesFilters();
+                
+                if (searchTermAll.trim()) {
+                    searchClearAll.classList.add('show');
+                } else {
+                    searchClearAll.classList.remove('show');
+                }
+            });
+            
+            searchClearAll.addEventListener('click', function() {
+                searchInputAll.value = '';
+                searchTermAll = '';
+                searchClearAll.classList.remove('show');
+                applyAllDevicesFilters();
+                searchInputAll.focus();
+            });
+        }
+        
+        // Ruckit assets search
+        const searchInputRuckit = document.getElementById('searchInputRuckit');
+        const searchClearRuckit = document.getElementById('searchClearRuckit');
+        
+        if (searchInputRuckit && searchClearRuckit) {
+            searchInputRuckit.addEventListener('input', function(e) {
+                searchTermRuckit = e.target.value;
+                applyFilters();
+                
+                if (searchTermRuckit.trim()) {
+                    searchClearRuckit.classList.add('show');
+                } else {
+                    searchClearRuckit.classList.remove('show');
+                }
+            });
+            
+            searchClearRuckit.addEventListener('click', function() {
+                searchInputRuckit.value = '';
+                searchTermRuckit = '';
+                searchClearRuckit.classList.remove('show');
+                applyFilters();
+                searchInputRuckit.focus();
+            });
+        }
+    }
+
+    /**
+     * Find existing mapping for a device
+     */
+    function findExistingMappingForDevice(deviceId) {
+        return assetsData.find(mapping => 
+            mapping.details && 
+            mapping.details['gt-device'] === deviceId
+        ) || null;
+    }
+
+    /**
+     * Show inline credential form
+     */
+    function showCredentialForm(deviceId, deviceName, existingMapping = null) {
+        editingDeviceId = deviceId;
+        
+        const defaultToken = existingMapping?.details?.['ri-token'] || '';
+        const defaultDevice = existingMapping?.details?.['ri-device'] || '';
+        const defaultDriver = existingMapping?.details?.['ri-driver'] || '';
+        
+        const formHtml = `
+            <tr id="credential-form-row-${deviceId}">
+                <td colspan="2">
+                    <div class="credential-form">
+                        <div class="credential-form-group">
+                            <label>Ruckit Token:</label>
+                            <input type="text" id="token-${deviceId}" value="${escapeHtml(defaultToken)}" placeholder="Enter token">
+                        </div>
+                        <div class="credential-form-group">
+                            <label>Ruckit Device ID:</label>
+                            <input type="text" id="device-${deviceId}" value="${escapeHtml(defaultDevice)}" placeholder="Enter device ID">
+                        </div>
+                        <div class="credential-form-group">
+                            <label>Ruckit Driver ID:</label>
+                            <input type="text" id="driver-${deviceId}" value="${escapeHtml(defaultDriver)}" placeholder="Enter driver ID">
+                        </div>
+                        <div class="credential-form-actions">
+                            <button class="btn-credential btn-credential-cancel" onclick="cancelCredentialForm('${deviceId}')">
+                                Cancel
+                            </button>
+                            <button class="btn-credential btn-credential-save" onclick="saveCredentials('${deviceId}', '${escapeHtml(deviceName)}')">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Find the device row and insert form after it
+        const deviceRow = document.querySelector(`tr[data-device-id="${deviceId}"]`);
+        if (deviceRow) {
+            // Remove any existing form
+            const existingForm = document.getElementById(`credential-form-row-${deviceId}`);
+            if (existingForm) {
+                existingForm.remove();
+            }
+            
+            deviceRow.insertAdjacentHTML('afterend', formHtml);
+        }
+    }
+
+    /**
+     * Cancel credential form
+     */
+    window.cancelCredentialForm = function(deviceId) {
+        const formRow = document.getElementById(`credential-form-row-${deviceId}`);
+        if (formRow) {
+            formRow.remove();
+        }
+        editingDeviceId = null;
+    };
+
+    /**
+     * Validate credentials are not already in use
+     */
+    async function validateCredentials(token, device, driver, currentDeviceId) {
+        try {
+            for (const mapping of assetsData) {
+                if (!mapping.details) continue;
+                
+                const gtDevice = mapping.details['gt-device'];
+                
+                // Skip the current device's mapping
+                if (gtDevice === currentDeviceId) continue;
+                
+                const existingToken = mapping.details['ri-token'];
+                const existingDevice = mapping.details['ri-device'];
+                const existingDriver = mapping.details['ri-driver'];
+                const deviceName = mapping.details['name'] || 'Unknown Device';
+                
+                // Skip placeholder values
+                if (existingToken === 'TOKEN' || existingDevice === 'DeviceID' || existingDriver === 'DriverID') {
+                    continue;
+                }
+                
+                if (existingToken === token) {
+                    return `Token "${token}" is already in use by device "${deviceName}"`;
+                }
+                
+                if (existingDevice === device) {
+                    return `Device ID "${device}" is already in use by device "${deviceName}"`;
+                }
+                
+                if (existingDriver === driver) {
+                    return `Driver ID "${driver}" is already in use by device "${deviceName}"`;
+                }
+            }
+            
+            return null;
+        } catch (error) {
+            console.error('Error validating credentials:', error);
+            return 'Error validating credentials';
+        }
+    }
+
+    /**
+     * Save credentials
+     */
+    window.saveCredentials = async function(deviceId, deviceName) {
+        const tokenInput = document.getElementById(`token-${deviceId}`);
+        const deviceInput = document.getElementById(`device-${deviceId}`);
+        const driverInput = document.getElementById(`driver-${deviceId}`);
+        
+        const token = tokenInput.value.trim();
+        const device = deviceInput.value.trim();
+        const driver = driverInput.value.trim();
+        
+        if (!token || !device || !driver) {
+            showAlert('Please fill in all fields', 'danger');
+            return;
+        }
+        
+        if (token === 'TOKEN' || device === 'DeviceID' || driver === 'DriverID') {
+            showAlert('Please enter actual values, not default placeholders', 'danger');
+            return;
+        }
+        
+        try {
+            // Validate credentials
+            const validationError = await validateCredentials(token, device, driver, deviceId);
+            if (validationError) {
+                showAlert(validationError, 'danger');
+                return;
+            }
+            
+            // Get device info for serial number
+            const devices = await makeGeotabCall("Get", "Device", { search: { id: deviceId } });
+            const serialNumber = devices && devices[0] ? devices[0].serialNumber : '';
+            
+            const existingMapping = findExistingMappingForDevice(deviceId);
+            
+            const mappingData = {
+                addInId: "aTMyNTA4NjktMzIxOC02YTQ",
+                details: {
+                    'date': new Date().toISOString(),
+                    'gt-device': deviceId,
+                    'name': deviceName,
+                    'gt-sn': serialNumber,
+                    'ri-token': token,
+                    'ri-device': device,
+                    'ri-driver': driver,
+                    'type': 'ri-device'
+                },
+                id: null
+            };
+            
+            if (existingMapping) {
+                mappingData.id = existingMapping.id;
+                mappingData.version = existingMapping.version;
+                await makeGeotabCall("Set", "AddInData", { entity: mappingData });
+            } else {
+                await makeGeotabCall("Add", "AddInData", { entity: mappingData });
+            }
+            
+            showAlert('Credentials saved successfully!', 'success');
+            cancelCredentialForm(deviceId);
+            
+            // Reload data
+            await loadRuckitAssets();
+            
+        } catch (error) {
+            console.error('Error saving credentials:', error);
+            showAlert('Error saving credentials: ' + error.message, 'danger');
+        }
+    };
+
+    /**
+     * Clear credentials
+     */
+    window.clearCredentials = async function(deviceId, deviceName) {
+        if (!confirm(`Are you sure you want to clear Ruckit credentials for ${deviceName}?`)) {
+            return;
+        }
+        
+        try {
+            const existingMapping = findExistingMappingForDevice(deviceId);
+            
+            if (!existingMapping) {
+                showAlert('No mapping found to clear', 'info');
+                return;
+            }
+            
+            const devices = await makeGeotabCall("Get", "Device", { search: { id: deviceId } });
+            const serialNumber = devices && devices[0] ? devices[0].serialNumber : '';
+            
+            const mappingData = {
+                addInId: "aTMyNTA4NjktMzIxOC02YTQ",
+                details: {
+                    'date': new Date().toISOString(),
+                    'gt-device': deviceId,
+                    'name': deviceName,
+                    'gt-sn': serialNumber,
+                    'ri-token': 'TOKEN',
+                    'ri-device': 'DeviceID',
+                    'ri-driver': 'DriverID',
+                    'type': 'ri-device'
+                },
+                id: existingMapping.id,
+                version: existingMapping.version
+            };
+            
+            await makeGeotabCall("Set", "AddInData", { entity: mappingData });
+            
+            showAlert('Credentials cleared successfully!', 'success');
+            
+            // Reload data
+            await loadRuckitAssets();
+            
+        } catch (error) {
+            console.error('Error clearing credentials:', error);
+            showAlert('Error clearing credentials: ' + error.message, 'danger');
+        }
+    };
 
     return {
         /**
