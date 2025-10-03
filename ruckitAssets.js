@@ -165,11 +165,32 @@ geotab.addin.ruckitAssets = function () {
             showAlert('Loading assets...', 'info');
             
             // Load all devices
-            allDevicesData = await getAllDevices();
+            const allDevices = await getAllDevices();
+            
+            // Filter out retired devices
+            allDevicesData = filterRetiredDevices(allDevices);
             
             // Load Ruckit mappings
             const ruckitData = await getRuckitMappings();
-            assetsData = ruckitData;
+            
+            // Sync device names between Geotab and AddInData
+            const updatedCount = await syncDeviceNames(allDevicesData, ruckitData);
+            
+            // Reload mappings if names were updated
+            if (updatedCount > 0) {
+                assetsData = await getRuckitMappings();
+            } else {
+                assetsData = ruckitData;
+            }
+            
+            // Filter out mappings for retired devices
+            assetsData = assetsData.filter(mapping => {
+                const deviceId = mapping.details?.['gt-device'];
+                if (!deviceId) return false;
+                
+                // Check if device still exists in active devices
+                return allDevicesData.some(device => device.id === deviceId);
+            });
             
             // Reset search terms
             searchTermAll = '';
@@ -186,12 +207,81 @@ geotab.addin.ruckitAssets = function () {
             applyFilters();
             
             const validAssets = filterPlaceholderEntries(assetsData);
-            showAlert(`Loaded ${allDevicesData.length} total assets, ${validAssets.length} with Ruckit credentials`, 'success');
+            const retiredCount = allDevices.length - allDevicesData.length;
+            
+            let message = `Loaded ${allDevicesData.length} active assets, ${validAssets.length} with Ruckit credentials`;
+            if (retiredCount > 0) {
+                message += ` (${retiredCount} retired assets hidden)`;
+            }
+            if (updatedCount > 0) {
+                message += ` (${updatedCount} name(s) updated)`;
+            }
+            
+            showAlert(message, 'success');
             
         } catch (error) {
             console.error('Error loading assets:', error);
             showAlert('Error loading assets: ' + error.message, 'danger');
         }
+    }
+
+    /**
+     * Sync device names in AddInData with current Geotab device names
+     */
+    async function syncDeviceNames(devices, mappings) {
+        const deviceMap = new Map(devices.map(d => [d.id, d.name]));
+        const updates = [];
+        
+        for (const mapping of mappings) {
+            if (!mapping.details || !mapping.details['gt-device']) continue;
+            
+            const deviceId = mapping.details['gt-device'];
+            const currentName = deviceMap.get(deviceId);
+            const storedName = mapping.details['name'];
+            
+            // If name has changed, prepare update
+            if (currentName && currentName !== storedName) {
+                console.log(`Updating device name: "${storedName}" -> "${currentName}"`);
+                
+                const updatedMapping = {
+                    ...mapping,
+                    details: {
+                        ...mapping.details,
+                        name: currentName,
+                        date: new Date().toISOString()
+                    }
+                };
+                
+                updates.push(updatedMapping);
+            }
+        }
+        
+        // Batch update all changed names
+        if (updates.length > 0) {
+            try {
+                for (const update of updates) {
+                    await makeGeotabCall("Set", "AddInData", { entity: update });
+                }
+                console.log(`Updated ${updates.length} device name(s)`);
+            } catch (error) {
+                console.error('Error updating device names:', error);
+            }
+        }
+        
+        return updates.length;
+    }
+
+    /**
+     * Filter out retired devices
+     */
+    function filterRetiredDevices(devices) {
+        const now = new Date();
+        return devices.filter(device => {
+            if (!device.activeTo) return true;
+            
+            const activeTo = new Date(device.activeTo);
+            return activeTo > now;
+        });
     }
 
     /**
