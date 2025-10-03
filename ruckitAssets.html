@@ -52,13 +52,13 @@
         <div id="alertContainer"></div>
         
         <div class="row">
-            <!-- Left Column: All Assets -->
+            <!-- Left Column: Assets without Ruckit Credentials -->
             <div class="col-md-6">
-                <!-- Search Bar for All Assets -->
+                <!-- Search Bar -->
                 <div class="search-container">
                     <div class="search-header">
                         <h6>
-                            <i class="fas fa-search me-2"></i>Search All Assets
+                            <i class="fas fa-search me-2"></i>Search Available Assets
                         </h6>
                     </div>
                     <div class="search-body">
@@ -76,11 +76,11 @@
                     </div>
                 </div>
                 
-                <!-- All Assets Table -->
+                <!-- Assets without Credentials Table -->
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-list me-2"></i>All Assets
+                            <i class="fas fa-list me-2"></i>Assets Without Ruckit Credentials
                             <span class="badge ms-2" id="assetCountAll">0</span>
                         </h5>
                     </div>
@@ -113,7 +113,7 @@
             
             <!-- Right Column: Assets with Ruckit Credentials -->
             <div class="col-md-6">
-                <!-- Search Bar for Ruckit Assets -->
+                <!-- Search Bar -->
                 <div class="search-container">
                     <div class="search-header">
                         <h6>
@@ -149,15 +149,12 @@
                                 <thead>
                                     <tr>
                                         <th><i class="fas fa-tag me-2"></i>Asset Name</th>
-                                        <th><i class="fas fa-microchip me-2"></i>Ruckit Device</th>
-                                        <th><i class="fas fa-user me-2"></i>Ruckit Driver</th>
-                                        <th><i class="fas fa-key me-2"></i>Ruckit Token</th>
                                         <th><i class="fas fa-cog me-2"></i>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ruckitAssetsTableBody">
                                     <tr>
-                                        <td colspan="5" class="text-center">
+                                        <td colspan="2" class="text-center">
                                             <div class="loading-spinner">
                                                 <div class="spinner-border" role="status">
                                                     <span class="visually-hidden">Loading...</span>

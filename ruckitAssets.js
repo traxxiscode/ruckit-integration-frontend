@@ -195,20 +195,30 @@ geotab.addin.ruckitAssets = function () {
     }
 
     /**
-     * Render all devices table (left column)
+     * Render all devices table (left column) - only devices WITHOUT credentials
      */
     function renderAllDevicesTable(data) {
         const tableBody = document.getElementById('allAssetsTableBody');
         if (!tableBody) return;
         
-        if (!data || data.length === 0) {
+        // Filter to only show devices without credentials
+        const devicesWithoutCreds = data.filter(device => {
+            const existingMapping = findExistingMappingForDevice(device.id);
+            const hasValidCredentials = existingMapping && 
+                                    existingMapping.details['ri-token'] !== 'TOKEN' &&
+                                    existingMapping.details['ri-device'] !== 'DeviceID' &&
+                                    existingMapping.details['ri-driver'] !== 'DriverID';
+            return !hasValidCredentials;
+        });
+        
+        if (devicesWithoutCreds.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="2">
                         <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h5>No Assets Found</h5>
-                            <p>No assets found in the system.</p>
+                            <i class="fas fa-check-circle"></i>
+                            <h5>All Assets Have Credentials</h5>
+                            <p>All assets have been configured with Ruckit credentials.</p>
                         </div>
                     </td>
                 </tr>
@@ -216,24 +226,19 @@ geotab.addin.ruckitAssets = function () {
             return;
         }
         
-        const tableRows = data.map(device => {
+        const tableRows = devicesWithoutCreds.map(device => {
             const deviceId = device.id;
             const deviceName = device.name || 'N/A';
-            const existingMapping = findExistingMappingForDevice(deviceId);
-            const hasCredentials = existingMapping && 
-                                existingMapping.details['ri-token'] !== 'TOKEN' &&
-                                existingMapping.details['ri-device'] !== 'DeviceID';
             
             return `
                 <tr data-device-id="${deviceId}">
                     <td>
                         <i class="fas fa-truck me-2 text-primary"></i>
                         ${escapeHtml(deviceName)}
-                        ${hasCredentials ? '<span class="badge bg-success ms-2">Has Credentials</span>' : ''}
                     </td>
                     <td>
-                        <button class="btn-add-credentials" onclick="showCredentialForm('${deviceId}', '${escapeHtml(deviceName)}', ${existingMapping ? 'true' : 'false'})">
-                            <i class="fas fa-plus me-1"></i>${hasCredentials ? 'Edit' : 'Add'}
+                        <button class="btn-add-credentials" onclick="window.showCredentialForm('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}', null)">
+                            <i class="fas fa-plus me-1"></i>Add Credentials
                         </button>
                     </td>
                 </tr>
@@ -244,7 +249,7 @@ geotab.addin.ruckitAssets = function () {
     }
 
     /**
-     * Render the assets table
+     * Render Ruckit assets table (right column) - with show/hide credentials
      */
     function renderAssetsTable(data) {
         const tableBody = document.getElementById('ruckitAssetsTableBody');
@@ -254,7 +259,7 @@ geotab.addin.ruckitAssets = function () {
             if (searchTermRuckit.trim()) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="5">
+                        <td colspan="2">
                             <div class="no-search-results">
                                 <i class="fas fa-search"></i>
                                 <h5>No Results Found</h5>
@@ -266,7 +271,7 @@ geotab.addin.ruckitAssets = function () {
             } else {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="5">
+                        <td colspan="2">
                             <div class="empty-state">
                                 <i class="fas fa-inbox"></i>
                                 <h5>No Ruckit Assets Found</h5>
@@ -288,26 +293,44 @@ geotab.addin.ruckitAssets = function () {
             const gtDevice = details['gt-device'] || '';
             
             const viewAssetUrl = generateViewAssetUrl(gtDevice);
+            const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
             
             return `
-                <tr>
+                <tr data-device-id="${gtDevice}">
                     <td>
                         <i class="fas fa-truck me-2 text-primary"></i>
                         ${escapeHtml(assetName)}
                     </td>
-                    <td>${escapeHtml(ruckitDevice)}</td>
-                    <td>${escapeHtml(ruckitDriver)}</td>
-                    <td>${escapeHtml(ruckitToken)}</td>
                     <td>
-                        <button class="btn-edit-credentials" onclick="showCredentialForm('${gtDevice}', '${escapeHtml(assetName)}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn-clear-credentials" onclick="clearCredentials('${gtDevice}', '${escapeHtml(assetName)}')">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
-                        ${gtDevice ? `<a href="${viewAssetUrl}" class="btn-view-asset" target="_blank">
-                            <i class="fas fa-external-link-alt"></i> View
-                        </a>` : ''}
+                        <div class="action-buttons">
+                            <button class="btn-show-credentials" onclick="window.toggleCredentials('${escapeHtml(gtDevice)}')">
+                                <i class="fas fa-eye me-1"></i>Show Credentials
+                            </button>
+                            <button class="btn-edit-credentials" onclick="window.showCredentialForm('${escapeHtml(gtDevice)}', '${escapeHtml(assetName)}', ${itemJson})">
+                                <i class="fas fa-edit me-1"></i>Edit
+                            </button>
+                            ${gtDevice ? `<a href="${viewAssetUrl}" class="btn-view-asset" target="_blank">
+                                <i class="fas fa-external-link-alt me-1"></i>View Asset
+                            </a>` : ''}
+                        </div>
+                    </td>
+                </tr>
+                <tr id="credentials-row-${gtDevice}" style="display: none;">
+                    <td colspan="2">
+                        <div class="credential-details">
+                            <div class="credential-details-row">
+                                <span class="credential-details-label">Ruckit Token:</span>
+                                <span class="credential-details-value">${escapeHtml(ruckitToken)}</span>
+                            </div>
+                            <div class="credential-details-row">
+                                <span class="credential-details-label">Ruckit Device ID:</span>
+                                <span class="credential-details-value">${escapeHtml(ruckitDevice)}</span>
+                            </div>
+                            <div class="credential-details-row">
+                                <span class="credential-details-label">Ruckit Driver ID:</span>
+                                <span class="credential-details-value">${escapeHtml(ruckitDriver)}</span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -315,6 +338,24 @@ geotab.addin.ruckitAssets = function () {
         
         tableBody.innerHTML = tableRows;
     }
+
+    /**
+     * Toggle credentials visibility
+     */
+    window.toggleCredentials = function(deviceId) {
+        const credentialsRow = document.getElementById(`credentials-row-${deviceId}`);
+        const button = document.querySelector(`tr[data-device-id="${deviceId}"] .btn-show-credentials`);
+        
+        if (credentialsRow && button) {
+            if (credentialsRow.style.display === 'none') {
+                credentialsRow.style.display = 'table-row';
+                button.innerHTML = '<i class="fas fa-eye-slash me-1"></i>Hide Credentials';
+            } else {
+                credentialsRow.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye me-1"></i>Show Credentials';
+            }
+        }
+    };
 
     /**
      * Show alert messages
@@ -452,12 +493,29 @@ geotab.addin.ruckitAssets = function () {
         const totalAssetsEl = document.getElementById('totalAssetsAll');
         const assetCountEl = document.getElementById('assetCountAll');
         
-        const filteredCount = filteredAllDevices.length;
-        const totalCount = allDevicesData.length;
+        // Count devices without credentials from the full dataset
+        const devicesWithoutCreds = allDevicesData.filter(device => {
+            const existingMapping = findExistingMappingForDevice(device.id);
+            const hasValidCredentials = existingMapping && 
+                                    existingMapping.details['ri-token'] !== 'TOKEN' &&
+                                    existingMapping.details['ri-device'] !== 'DeviceID' &&
+                                    existingMapping.details['ri-driver'] !== 'DriverID';
+            return !hasValidCredentials;
+        });
+        
+        // Count filtered devices without credentials
+        const filteredWithoutCreds = filteredAllDevices.filter(device => {
+            const existingMapping = findExistingMappingForDevice(device.id);
+            const hasValidCredentials = existingMapping && 
+                                    existingMapping.details['ri-token'] !== 'TOKEN' &&
+                                    existingMapping.details['ri-device'] !== 'DeviceID' &&
+                                    existingMapping.details['ri-driver'] !== 'DriverID';
+            return !hasValidCredentials;
+        });
         
         if (searchResultsEl) {
             if (searchTermAll.trim()) {
-                searchResultsEl.textContent = `Showing ${filteredCount} of ${totalCount} assets`;
+                searchResultsEl.textContent = `Showing ${filteredWithoutCreds.length} of ${devicesWithoutCreds.length} assets`;
                 searchResultsEl.classList.add('filtered');
             } else {
                 searchResultsEl.textContent = 'Showing all assets';
@@ -466,11 +524,11 @@ geotab.addin.ruckitAssets = function () {
         }
         
         if (totalAssetsEl) {
-            totalAssetsEl.textContent = `Total: ${totalCount}`;
+            totalAssetsEl.textContent = `Total: ${devicesWithoutCreds.length}`;
         }
         
         if (assetCountEl) {
-            assetCountEl.textContent = filteredCount;
+            assetCountEl.textContent = filteredWithoutCreds.length;
         }
     }
 
@@ -572,12 +630,16 @@ geotab.addin.ruckitAssets = function () {
     /**
      * Show inline credential form
      */
-    function showCredentialForm(deviceId, deviceName, existingMapping = null) {
+    window.showCredentialForm = function(deviceId, deviceName, existingMapping) {
         editingDeviceId = deviceId;
         
         const defaultToken = existingMapping?.details?.['ri-token'] || '';
         const defaultDevice = existingMapping?.details?.['ri-device'] || '';
         const defaultDriver = existingMapping?.details?.['ri-driver'] || '';
+        
+        const showClearButton = existingMapping && 
+                            existingMapping.details['ri-token'] !== 'TOKEN' &&
+                            existingMapping.details['ri-device'] !== 'DeviceID';
         
         const formHtml = `
             <tr id="credential-form-row-${deviceId}">
@@ -596,11 +658,16 @@ geotab.addin.ruckitAssets = function () {
                             <input type="text" id="driver-${deviceId}" value="${escapeHtml(defaultDriver)}" placeholder="Enter driver ID">
                         </div>
                         <div class="credential-form-actions">
-                            <button class="btn-credential btn-credential-cancel" onclick="cancelCredentialForm('${deviceId}')">
+                            ${showClearButton ? `
+                                <button class="btn-credential btn-credential-clear" onclick="window.clearCredentials('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}')">
+                                    <i class="fas fa-trash me-1"></i>Clear
+                                </button>
+                            ` : ''}
+                            <button class="btn-credential btn-credential-cancel" onclick="window.cancelCredentialForm('${escapeHtml(deviceId)}')">
                                 Cancel
                             </button>
-                            <button class="btn-credential btn-credential-save" onclick="saveCredentials('${deviceId}', '${escapeHtml(deviceName)}')">
-                                Save
+                            <button class="btn-credential btn-credential-save" onclick="window.saveCredentials('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}')">
+                                <i class="fas fa-save me-1"></i>Save
                             </button>
                         </div>
                     </div>
@@ -617,9 +684,15 @@ geotab.addin.ruckitAssets = function () {
                 existingForm.remove();
             }
             
+            // Hide credentials row if visible
+            const credentialsRow = document.getElementById(`credentials-row-${deviceId}`);
+            if (credentialsRow) {
+                credentialsRow.style.display = 'none';
+            }
+            
             deviceRow.insertAdjacentHTML('afterend', formHtml);
         }
-    }
+    };
 
     /**
      * Cancel credential form
@@ -784,6 +857,9 @@ geotab.addin.ruckitAssets = function () {
             await makeGeotabCall("Set", "AddInData", { entity: mappingData });
             
             showAlert('Credentials cleared successfully!', 'success');
+            
+            // Close the form
+            cancelCredentialForm(deviceId);
             
             // Reload data
             await loadRuckitAssets();
