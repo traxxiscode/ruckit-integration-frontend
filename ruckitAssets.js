@@ -319,6 +319,8 @@ geotab.addin.ruckitAssets = function () {
         const tableRows = devicesWithoutCreds.map(device => {
             const deviceId = device.id;
             const deviceName = device.name || 'N/A';
+            const deviceIdEscaped = escapeHtml(deviceId).replace(/'/g, "\\'");
+            const deviceNameEscaped = escapeHtml(deviceName).replace(/'/g, "\\'");
             
             return `
                 <tr data-device-id="${deviceId}">
@@ -327,7 +329,7 @@ geotab.addin.ruckitAssets = function () {
                         ${escapeHtml(deviceName)}
                     </td>
                     <td>
-                        <button class="btn-add-credentials" onclick="window.showCredentialForm('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}', null)">
+                        <button class="btn-add-credentials" onclick="window.showCredentialForm('${deviceIdEscaped}', '${deviceNameEscaped}', null)">
                             <i class="fas fa-plus me-1"></i>Add Credentials
                         </button>
                     </td>
@@ -384,6 +386,8 @@ geotab.addin.ruckitAssets = function () {
             
             const viewAssetUrl = generateViewAssetUrl(gtDevice);
             const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+            const gtDeviceEscaped = escapeHtml(gtDevice).replace(/'/g, "\\'");
+            const assetNameEscaped = escapeHtml(assetName).replace(/'/g, "\\'");
             
             return `
                 <tr data-device-id="${gtDevice}">
@@ -393,10 +397,10 @@ geotab.addin.ruckitAssets = function () {
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-show-credentials" onclick="window.toggleCredentials('${escapeHtml(gtDevice)}')">
+                            <button class="btn-show-credentials" onclick="window.toggleCredentials('${gtDeviceEscaped}')">
                                 <i class="fas fa-eye me-1"></i>Show Credentials
                             </button>
-                            <button class="btn-edit-credentials" onclick="window.showCredentialForm('${escapeHtml(gtDevice)}', '${escapeHtml(assetName)}', ${itemJson})">
+                            <button class="btn-edit-credentials" onclick="window.showCredentialForm('${gtDeviceEscaped}', '${assetNameEscaped}', ${itemJson})">
                                 <i class="fas fa-edit me-1"></i>Edit
                             </button>
                             ${gtDevice ? `<a href="${viewAssetUrl}" class="btn-view-asset" target="_blank">
@@ -733,6 +737,9 @@ geotab.addin.ruckitAssets = function () {
                             existingMapping.details['ri-token'] !== 'TOKEN' &&
                             existingMapping.details['ri-device'] !== 'DeviceID';
         
+        const deviceIdEscaped = escapeHtml(deviceId).replace(/'/g, "\\'");
+        const deviceNameEscaped = escapeHtml(deviceName).replace(/'/g, "\\'");
+        
         const formHtml = `
             <tr id="credential-form-row-${deviceId}">
                 <td colspan="2">
@@ -751,14 +758,14 @@ geotab.addin.ruckitAssets = function () {
                         </div>
                         <div class="credential-form-actions">
                             ${showClearButton ? `
-                                <button class="btn-credential btn-credential-clear" onclick="window.clearCredentials('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}')">
+                                <button class="btn-credential btn-credential-clear" onclick="window.clearCredentials('${deviceIdEscaped}', '${deviceNameEscaped}')">
                                     <i class="fas fa-trash me-1"></i>Clear
                                 </button>
                             ` : ''}
-                            <button class="btn-credential btn-credential-cancel" onclick="window.cancelCredentialForm('${escapeHtml(deviceId)}')">
+                            <button class="btn-credential btn-credential-cancel" onclick="window.cancelCredentialForm('${deviceIdEscaped}')">
                                 Cancel
                             </button>
-                            <button class="btn-credential btn-credential-save" onclick="window.saveCredentials('${escapeHtml(deviceId)}', '${escapeHtml(deviceName)}')">
+                            <button class="btn-credential btn-credential-save" onclick="window.saveCredentials('${deviceIdEscaped}', '${deviceNameEscaped}')">
                                 <i class="fas fa-save me-1"></i>Save
                             </button>
                         </div>
