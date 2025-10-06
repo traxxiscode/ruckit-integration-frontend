@@ -722,6 +722,8 @@ geotab.addin.ruckitAssets = function () {
      */
     window.showCredentialForm = function(deviceId, deviceName, existingMapping) {
         editingDeviceId = deviceId;
+
+        console.log('Showing credential form for device:', deviceId, deviceName, existingMapping);
         
         const defaultToken = existingMapping?.details?.['ri-token'] || '';
         const defaultDevice = existingMapping?.details?.['ri-device'] || '';
