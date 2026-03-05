@@ -3,12 +3,12 @@
     /* Primary colors matching index.css */
     --primary-orange: #e55a2b;
     --secondary-orange: #d4761a;
-    --primary-blue: #1e3c72;
-    --secondary-blue: #2a5298;
+    --primary-blue: #0C2853;
+    --secondary-blue: #1A4A7A;
     --light-blue: #dbeafe;
-    --dark-blue: #1e40af;
-    --accent-blue: #03adfc;
-    --accent-blue-dark: #0394fc;
+    --dark-blue: #0C1E42;
+    --accent-blue: #0C2853;
+    --accent-blue-dark: #0C1E42;
     
     /* Neutral colors */
     --header-grey: #6b7280;
@@ -35,12 +35,16 @@ body {
 
 /* Header Styles - Updated to match modern gradient design */
 .header {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    background: linear-gradient(135deg, #0C1E42 0%, #0C2853 100%);
     color: white;
-    padding: 1.5rem 0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
+    padding: 0;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header::before {
@@ -55,23 +59,26 @@ body {
 }
 
 .header-content {
-    min-height: 80px;
     position: relative;
     z-index: 2;
+    width: 100%;
 }
 
 .header-title {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: white;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
 }
 
 .header-subtitle {
-    font-size: 0.95rem;
-    opacity: 0.9;
-    margin: 0;
-    font-weight: 300;
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin: 0.15rem 0 0 0;
+    line-height: 1.3;
+    letter-spacing: 0.03em;
 }
 
 /* Logo Styles */
@@ -82,11 +89,9 @@ body {
 }
 
 .company-logo {
-    max-width: 120px;
-    max-height: 50px;
+    height: 36px;
     width: auto;
-    object-fit: contain;
-    filter: brightness(1.1);
+    display: block;
     transition: all 0.3s ease;
 }
 
@@ -149,7 +154,7 @@ body {
 }
 
 .btn-view-asset {
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+    background: linear-gradient(135deg, #0C2853 0%, #0C1E42 100%);
     border: none;
     border-radius: 6px;
     color: white;
@@ -161,12 +166,12 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    box-shadow: 0 2px 8px rgba(3, 173, 252, 0.3);
+    box-shadow: 0 2px 8px rgba(12, 40, 83, 0.25);
 }
 
 .btn-view-asset:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(3, 173, 252, 0.4);
+    box-shadow: 0 4px 15px rgba(12, 40, 83, 0.35);
     color: white;
     text-decoration: none;
 }
@@ -239,7 +244,7 @@ body {
 }
 
 .table thead th {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    background: linear-gradient(135deg, #0C1E42 0%, #0C2853 100%);
     color: white;
     border: none;
     font-weight: 600;
@@ -362,9 +367,9 @@ body {
 }
 
 .alert-info {
-    background-color: rgba(3, 173, 252, 0.1);
+    background-color: rgba(12, 40, 83, 0.1);
     color: var(--primary-blue);
-    border-left: 4px solid var(--accent-blue);
+    border-left: 4px solid #0C2853;
 }
 
 /* Empty State */
@@ -412,13 +417,9 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .header {
-        padding: 1rem 0;
-    }
-    
-    .header-title {
-        font-size: 1.5rem;
-    }
+    .header { height: auto; padding: 0.75rem 0; }
+    .header-title { font-size: 1.15rem; }
+    .company-logo { height: 28px; }
     
     .header-buttons {
         flex-direction: column;
@@ -722,13 +723,13 @@ body {
 }
 
 .btn-credential-save {
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+    background: linear-gradient(135deg, #0C2853 0%, #0C1E42 100%);
     color: white;
 }
 
 .btn-credential-save:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(3, 173, 252, 0.3);
+    box-shadow: 0 4px 12px rgba(12, 40, 83, 0.25);
 }
 
 .btn-credential-cancel {
@@ -759,7 +760,7 @@ body {
 }
 
 .btn-edit-credentials {
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+    background: linear-gradient(135deg, #0C2853 0%, #0C1E42 100%);
     border: none;
     border-radius: 6px;
     color: white;
@@ -772,7 +773,7 @@ body {
 
 .btn-edit-credentials:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(3, 173, 252, 0.4);
+    box-shadow: 0 4px 15px rgba(12, 40, 83, 0.35);
 }
 
 .btn-clear-credentials {
@@ -858,13 +859,13 @@ body {
 }
 
 .btn-edit-credentials {
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
-    box-shadow: 0 2px 8px rgba(3, 173, 252, 0.3);
+    background: linear-gradient(135deg, #0C2853 0%, #0C1E42 100%);
+    box-shadow: 0 2px 8px rgba(12, 40, 83, 0.25);
 }
 
 .btn-edit-credentials:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(3, 173, 252, 0.4);
+    box-shadow: 0 4px 15px rgba(12, 40, 83, 0.35);
     color: white;
 }
 
