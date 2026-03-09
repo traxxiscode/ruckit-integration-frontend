@@ -11,36 +11,23 @@
 </head>
 <body>
 <div id="ruckitAssets" style="display:none;">
-    <div class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <img src="https://cdn.baseline.is/static/content/logos/mDtvptChQ3XwBLuxuu5hip-lala.svg"
-                             alt="Logo" class="company-logo"
-                             onerror="this.style.display='none';">
-                    </div>
-                    <div class="col">
-                        <h1 class="header-title">
-                            <i class="fas fa-truck me-2"></i>Ruckit Assets
-                        </h1>
-                    </div>
-                    <div class="col-auto">
-                        <div class="header-buttons">
-                            <button class="btn btn-refresh" onclick="refreshData()">
-                                <i class="fas fa-sync-alt me-2"></i>Refresh
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header actions injected into the Geotab dashboard header -->
+    <div data-suite-actions style="display:none;">
+        <button class="btn btn-refresh btn-loading" id="refreshBtn" onclick="refreshData()">
+            <span class="btn-text" style="display:inline-flex;align-items:center;">
+                <i class="fas fa-sync-alt me-2"></i><span class="btn-label">Refresh</span>
+            </span>
+            <span class="btn-loading-text" style="display:none;">
+                <span class="spinner-border spinner-border-sm me-1" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </span>
+                Loading...
+            </span>
+        </button>
     </div>
 
     <div class="container main-container">
-        <!-- Alert Messages -->
-        <div id="alertContainer"></div>
-        
         <div class="row">
             <!-- Left Column: Assets without Ruckit Credentials -->
             <div class="col-md-6">
@@ -65,7 +52,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Assets without Credentials Table -->
                 <div class="card">
                     <div class="card-header">
@@ -100,7 +87,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Column: Assets with Ruckit Credentials -->
             <div class="col-md-6">
                 <!-- Search Bar -->
@@ -124,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Ruckit Assets Table -->
                 <div class="card">
                     <div class="card-header">
